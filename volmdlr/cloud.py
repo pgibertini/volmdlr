@@ -111,6 +111,10 @@ class PointCloud3D(dc.DessiaObject):
                 2) for pos_plane in position_plane]
         subcloud2d = [subcloud3d[n].to_subcloud2d(position_plane[n] * normal, vec1, vec2) for n in range(resolution)]
 
+        for c, cloud2d in enumerate(subcloud2d):
+            cloud2d.save_to_file('cloud2d_'+str(c))
+            
+
         # Offsetting
         if offset != 0:
             initial_polygon2d = [cloud2d.to_polygon(convexe=True) for cloud2d in subcloud2d]

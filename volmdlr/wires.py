@@ -2217,10 +2217,12 @@ class ClosedPolygon2D(Contour2D, ClosedPolygon):
         return False, None, None
 
     @classmethod
-    def points_convex_hull(cls, points):
+    def points_convex_hull(cls, working_points):
+        points = [pt.copy() for pt in working_points]
+        
         if len(points) < 3:
             return
-        ymax, pos_ymax = volmdlr.core.max_pos([pt.y for pt in points])
+        pos_ymax = [pt.y for pt in points].index(max([pt.y for pt in points]))
         point_start = points[pos_ymax]
         hull = [point_start]
 
@@ -2228,6 +2230,7 @@ class ClosedPolygon2D(Contour2D, ClosedPolygon):
         for pt in points[1:]:
             barycenter += pt
         barycenter = barycenter / (len(points))
+        
         # second point of hull
         theta = []
         remaining_points = points
@@ -2239,7 +2242,8 @@ class ClosedPolygon2D(Contour2D, ClosedPolygon):
             theta_i = -volmdlr.core.clockwise_angle(vec1, vec2)
             theta.append(theta_i)
 
-        min_theta, posmin_theta = volmdlr.core.min_pos(theta)
+        # min_theta, posmin_theta = volmdlr.core.min_pos(theta)
+        posmin_theta = theta.index(min(theta))
         next_point = remaining_points[posmin_theta]
         hull.append(next_point)
         del remaining_points[posmin_theta]
@@ -2256,7 +2260,9 @@ class ClosedPolygon2D(Contour2D, ClosedPolygon):
                 theta_i = -volmdlr.core.clockwise_angle(vec1, vec2)
                 theta.append(theta_i)
 
-            min_theta, posmin_theta = volmdlr.core.min_pos(theta)
+            # min_theta, posmin_theta = volmdlr.core.min_pos(theta)
+            min_theta = min(theta)
+            posmin_theta = theta.index(min_theta)
             if math.isclose(min_theta, -2 * math.pi, abs_tol=1e-6) \
                     or math.isclose(min_theta, 0, abs_tol=1e-6):
                 if remaining_points[posmin_theta] == point_start:
@@ -2278,7 +2284,7 @@ class ClosedPolygon2D(Contour2D, ClosedPolygon):
             del remaining_points[posmin_theta]
 
         hull.pop()
-
+        
         return cls(hull)
 
     @classmethod

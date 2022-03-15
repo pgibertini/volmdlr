@@ -204,6 +204,8 @@ def delete_double_point(list_point):
 
 
 def max_pos(list_of_float):
+    print('>>>>>>>>>> if you see this message, you probably use "max_pos" method in volmdlr.core, please can you change by using')
+    print('yourlist.index(max(yourlist))')
     pos_max, max_float = 0, list_of_float[0]
     for pos, fl in enumerate(list_of_float):
         if pos == 0:
@@ -216,6 +218,8 @@ def max_pos(list_of_float):
 
 
 def min_pos(list_of_float):
+    print('>>>>>>>>>> if you see this message, you probably use "min_pos" method in volmdlr.core, please can you change by using')
+    print('yourlist.index(min(yourlist))')
     pos_min, min_float = 0, list_of_float[0]
     for pos, fl in enumerate(list_of_float):
         if pos == 0:
