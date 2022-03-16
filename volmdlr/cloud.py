@@ -111,10 +111,6 @@ class PointCloud3D(dc.DessiaObject):
                 2) for pos_plane in position_plane]
         subcloud2d = [subcloud3d[n].to_subcloud2d(position_plane[n] * normal, vec1, vec2) for n in range(resolution)]
 
-        for c, cloud2d in enumerate(subcloud2d):
-            cloud2d.save_to_file('cloud2d_'+str(c))
-            
-
         # Offsetting
         if offset != 0:
             initial_polygon2d = [cloud2d.to_polygon(convexe=True) for cloud2d in subcloud2d]
@@ -141,7 +137,8 @@ class PointCloud3D(dc.DessiaObject):
             # print('sewing polygon', round(n/resolution*100, 2), '%')
             poly1 = polygon3d[n]
 
-            poly1_simplified = poly1.simplify(0.01, 0.03)
+            # poly1_simplified = poly1.simplify(0.01, 0.03)
+            poly1_simplified = poly1.simplify(angle_precision = 20)
 
             if 1 - poly1_simplified.to_2d(position_plane[n] * normal, vec1,
                                           vec2).area() / poly1.to_2d(position_plane[n] * normal, vec1, vec2).area() > 0.3:
@@ -161,12 +158,14 @@ class PointCloud3D(dc.DessiaObject):
             if n != resolution - 1:
                 poly2 = polygon3d[n + 1]
 
-                poly2_simplified = poly2.simplify(0.01, 0.03)
+                # poly2_simplified = poly2.simplify(0.01, 0.03)
+                poly2_simplified = poly2.simplify(angle_precision = 20)
 
                 if 1 - poly2_simplified.to_2d(position_plane[n] * normal, vec1,
                                               vec2).area() / poly2.to_2d(
                         position_plane[n] * normal, vec1, vec2).area() > 0.3:
                     poly2_simplified = poly2
+                    
                 faces.extend(poly1_simplified.sewing3(poly2_simplified,
                                                       vec1, vec2))
                 # for trio in coords:

@@ -1810,52 +1810,101 @@ class ClosedPolygon:
         std = npy.std(distances)
         return mean_distance, std
 
-    def simplify_polygon(self, min_distance: float = 0.01,
-                         max_distance: float = 0.05, angle: float = 20):
-        points = [self.points[0]]
-        previous_point = None
-        for i, point in enumerate(self.points[1:]):
-            distance = point.point_distance(points[-1])
-            if distance > min_distance:
-                if distance > max_distance:
-                    number_segmnts = round(distance / max_distance) + 2
-                    for n in range(number_segmnts):
-                        new_point = points[-1] + (point - points[-1]) * (
-                                n + 1) / number_segmnts
-                        distance1 = new_point.point_distance(points[-1])
-                        if distance1 > max_distance:
-                            points.append(new_point)
-                else:
+    # def simplify_polygon(self, min_distance: float = 0.01,
+    #                      max_distance: float = 0.05, angle: float = 20):
+    #     points = [self.points[0]]
+    #     previous_point = None
+    #     for i, point in enumerate(self.points[1:]):
+    #         distance = point.point_distance(points[-1])
+    #         if distance > min_distance:
+    #             if distance > max_distance:
+    #                 number_segmnts = round(distance / max_distance) + 2
+    #                 for n in range(number_segmnts):
+    #                     new_point = points[-1] + (point - points[-1]) * (
+    #                             n + 1) / number_segmnts
+    #                     distance1 = new_point.point_distance(points[-1])
+    #                     if distance1 > max_distance:
+    #                         points.append(new_point)
+    #             else:
 
-                    if point not in points:
-                        points.append(point)
-            elif len(points) > 1:
-                vector1 = points[-1] - points[-2]
-                vector2 = point - points[-2]
-                cos = vector1.dot(vector2) / (vector1.norm() * vector2.norm())
-                cos = math.degrees(math.acos(round(cos, 6)))
-                if abs(cos) > angle:
-                    if previous_point not in points:
-                        points.append(previous_point)
-                    if point not in points:
-                        points.append(point)
-            if len(points) > 2:
-                distance2 = points[-3].point_distance(points[-2])
-                vector1 = points[-2] - points[-3]
-                vector2 = points[-1] - points[-3]
-                cos = vector1.dot(vector2) / (vector1.norm() * vector2.norm())
-                cos = math.degrees(math.acos(round(cos, 6)))
-                if distance2 < min_distance and cos < angle:
-                    points = points[:-2] + [points[-1]]
-            previous_point = point
-        distance = points[0].point_distance(points[-1])
-        if distance < min_distance:
-            points.remove(points[-1])
+    #                 if point not in points:
+    #                     points.append(point)
+    #         elif len(points) > 1:
+    #             vector1 = points[-1] - points[-2]
+    #             vector2 = point - points[-2]
+    #             cos = vector1.dot(vector2) / (vector1.norm() * vector2.norm())
+    #             cos = math.degrees(math.acos(round(cos, 6)))
+    #             if abs(cos) > angle:
+    #                 if previous_point not in points:
+    #                     points.append(previous_point)
+    #                 if point not in points:
+    #                     points.append(point)
+    #         if len(points) > 2:
+    #             distance2 = points[-3].point_distance(points[-2])
+    #             vector1 = points[-2] - points[-3]
+    #             vector2 = points[-1] - points[-3]
+    #             cos = vector1.dot(vector2) / (vector1.norm() * vector2.norm())
+    #             cos = math.degrees(math.acos(round(cos, 6)))
+    #             if distance2 < min_distance and cos < angle:
+    #                 points = points[:-2] + [points[-1]]
+    #         previous_point = point
+    #     distance = points[0].point_distance(points[-1])
+    #     if distance < min_distance:
+    #         points.remove(points[-1])
 
-        if volmdlr.wires.ClosedPolygon2D(points).area() == 0.0:
+    #     if volmdlr.wires.ClosedPolygon2D(points).area() == 0.0:
+    #         return self
+
+    #     return self.__class__(points)
+    
+    def simplify_polygon(self, min_distance = 1e-3, angle_precision = 5):
+        new_polygon_points = []
+        pos1, pos2, pos3 = 0, 1, 2
+        
+        rad_precision = math.radians(angle_precision)
+        
+        while pos1 < len(self.points) :
+            
+            p1, p2, p3 = self.points[pos1], self.points[pos2], self.points[pos3]
+            check_distance = True
+            if pos1 != 0 :
+                if p1.point_distance(new_polygon_points[-1]) < min_distance:
+                    check_distance = False
+                    
+            if check_distance :
+                v1, v2 = p2 - p1, p3 - p2
+                cos = v1.dot(v2) / (v1.norm() * v2.norm())
+                angle_v1_v2 = math.acos(round(cos, 6))
+                    
+                    
+                if math.isclose(angle_v1_v2, 0, abs_tol=rad_precision) or \
+                    math.isclose(angle_v1_v2, math.pi, abs_tol=rad_precision) or \
+                    math.isclose(angle_v1_v2, 2*math.pi, abs_tol=rad_precision):
+                    pos2 = pos3
+                    pos3 += 1
+                    
+                else :
+                    new_polygon_points.append(p1)
+                    if pos1 > pos2 :
+                        break
+                    
+                    pos1, pos2 = pos2, pos3
+                    pos3 += 1
+                    
+            else :
+                pos1 += 1
+                pos2, pos3 = pos1+1, pos1+2
+                
+            if pos2 > len(self.points) -1 :
+                pos2 -= len(self.points)
+    
+            if pos3 > len(self.points) -1  :
+                pos3 -= len(self.points)
+    
+        if volmdlr.wires.ClosedPolygon2D(new_polygon_points).area() == 0.0:
             return self
-
-        return self.__class__(points)
+    
+        return self.__class__(new_polygon_points)
 
 
 class ClosedPolygon2D(Contour2D, ClosedPolygon):
@@ -2613,9 +2662,13 @@ class ClosedPolygon2D(Contour2D, ClosedPolygon):
 
         return vmd.DisplayMesh2D(points, triangles)
 
-    def simplify(self, min_distance: float = 0.01, max_distance: float = 0.05):
-        return ClosedPolygon2D(self.simplify_polygon(min_distance=min_distance,
-                                                     max_distance=max_distance).points)
+    # def simplify(self, min_distance: float = 0.01, max_distance: float = 0.05):
+    #     return ClosedPolygon2D(self.simplify_polygon(min_distance=min_distance,
+    #                                                  max_distance=max_distance).points)
+    
+    def simplify(self, min_distance: float = 0.01, angle_precision: float = 15):
+        return ClosedPolygon2D(self.simplify_polygon(
+            min_distance=min_distance, angle_precision=angle_precision).points)
 
     def line_intersecting_closing_point(self, crossing_point):
         """
@@ -4035,10 +4088,14 @@ class ClosedPolygon3D(Contour3D, ClosedPolygon):
 
         return triangles
 
-    def simplify(self, min_distance: float = 0.01, max_distance: float = 0.05):
+    # def simplify(self, min_distance: float = 0.01, max_distance: float = 0.05):
+    #     return ClosedPolygon3D(self.simplify_polygon(
+    #         min_distance=min_distance, max_distance=max_distance).points)
+    
+    def simplify(self, min_distance: float = 0.01, angle_precision: float = 15):
         return ClosedPolygon3D(self.simplify_polygon(
-            min_distance=min_distance, max_distance=max_distance).points)
-
+            min_distance=min_distance, angle_precision=angle_precision).points)
+    
     def sewing(self, polygon2, x, y):
         """
         x and y are used for plane projection to make sure it is being projected in the right plane

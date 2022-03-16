@@ -443,20 +443,26 @@ vm.Point3D(0.00014119166135787963, 0.2217896728515625, 0.459764476853974), vm.Po
 
 polygons = []
 for polygon_points in polygons_points:
-    polygons.append(vmw.ClosedPolygon3D(polygon_points))
+    cleaned_points = vm.Point3D.remove_duplicate(polygon_points)
+    # polygons.append(vmw.ClosedPolygon3D(polygon_points))
+    polygons.append(vmw.ClosedPolygon3D(cleaned_points))
 
 dict_closing = []
 list_closing_point = []
 count = 0
 for i, i_polygon in enumerate(polygons):
+    ax = i_polygon.plot()
+    
     i_polygon = i_polygon.simplify()
+    
+    i_polygon.plot(ax=ax, color='r')
     for j, j_polygon in enumerate(polygons):
-        if i > j:
+        if i > j and i == 8:
             j_polygon = j_polygon.simplify()
             faces = i_polygon.sewing3(j_polygon, vm.X3D, vm.Y3D)
-            # vm.core.VolumeModel(faces).babylonjs()
+            vm.core.VolumeModel(faces).babylonjs()
             assert i_polygon.check_sewing(j_polygon, faces)
-            break
+            # break
 
 
 
