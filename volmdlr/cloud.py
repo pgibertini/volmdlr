@@ -140,9 +140,9 @@ class PointCloud3D(dc.DessiaObject):
             # poly1_simplified = poly1.simplify(0.01, 0.03)
             poly1_simplified = poly1.simplify(angle_precision = 20)
 
-            if 1 - poly1_simplified.to_2d(position_plane[n] * normal, vec1,
-                                          vec2).area() / poly1.to_2d(position_plane[n] * normal, vec1, vec2).area() > 0.3:
-                poly1_simplified = poly1
+            # if 1 - poly1_simplified.to_2d(position_plane[n] * normal, vec1,
+            #                               vec2).area() / poly1.to_2d(position_plane[n] * normal, vec1, vec2).area() > 0.3:
+            #     poly1_simplified = poly1
             # print('original area :', poly1.to_2d(position_plane[n]*normal, vec1, vec2).area())
             # print('simplified area :', poly1_simplified.to_2d(position_plane[n]*normal, vec1, vec2).area())
 
@@ -161,11 +161,10 @@ class PointCloud3D(dc.DessiaObject):
                 # poly2_simplified = poly2.simplify(0.01, 0.03)
                 poly2_simplified = poly2.simplify(angle_precision = 20)
 
-                if 1 - poly2_simplified.to_2d(position_plane[n] * normal, vec1,
-                                              vec2).area() / poly2.to_2d(
-                        position_plane[n] * normal, vec1, vec2).area() > 0.3:
-                    poly2_simplified = poly2
-                    
+                # if 1 - poly2_simplified.to_2d(position_plane[n] * normal, vec1,
+                #                               vec2).area() / poly2.to_2d(
+                #         position_plane[n] * normal, vec1, vec2).area() > 0.3:
+                #     poly2_simplified = poly2
                 faces.extend(poly1_simplified.sewing3(poly2_simplified,
                                                       vec1, vec2))
                 # for trio in coords:
