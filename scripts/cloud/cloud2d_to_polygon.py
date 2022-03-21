@@ -114,3 +114,25 @@ for poly in polys :
     new_poly2.plot(ax=ax, color = 'b')
     
     polys_simplified.append(new_poly2)
+    
+    
+ps0_2 = simplify_test(polys_simplified[0], angle_precision = 10)
+
+ax = polys_simplified[0].plot()
+
+for pt in ps0_2:
+    pt.plot(ax=ax, color='r')
+    
+print('1->2', len(polys_simplified[0].points), len(ps0_2))
+    
+    
+# new_poly2 = vmw.ClosedPolygon2D(ps0_2)
+# ps0_3 = simplify_test(new_poly2, angle_precision = 20)
+
+# ax = new_poly2.plot()
+
+# for pt in ps0_3:
+#     pt.plot(ax=ax, color='r')
+    
+# print('2->3', len(ps0_2), len(ps0_3))
+    
