@@ -90,7 +90,11 @@ class Edge(dc.DessiaObject):
         discretize a Edge to have "n" points (including start and end points)
         :return:
         """
+        if discretization_resolution ==0:
+            return([self.start, self.end])
+
         length = self.length()
+        # print('discretization_resolution:', discretization_resolution)
         return [self.point_at_abscissa(i * length / discretization_resolution) for i in
                 range(discretization_resolution + 1)]
 
