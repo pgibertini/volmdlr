@@ -3720,40 +3720,49 @@ class BSplineCurve3D(BSplineCurve, volmdlr.core.Primitive3D):
             return 1 / r_c, point
         return 1 / r_c
 
-    def global_maximum_curvature(self, nb_eval: int = 21, point_in_curve: bool = False):
+    def global_curvature(self, nb_eval: int = 21, point_in_curve: bool = False):
         check = [i / (nb_eval - 1) for i in range(nb_eval)]
         curvatures = []
         for u in check:
             curvatures.append(self.curvature(u, point_in_curve))
         return curvatures
 
-    def maximum_curvature(self, point_in_curve: bool = False):
+    def max_min_curvature(self, point_in_curve: bool = False, max_curvature: bool = True):
         """
-        Returns the maximum curvature of a curve and the point where it is located
+        Returns the maximum curvature of a curve and the point where it is located by default
         """
         if point_in_curve:
-            maximum_curvarture, point = max(self.global_maximum_curvature(nb_eval=21, point_in_curve=point_in_curve))
-            return maximum_curvarture, point
-        # print(self.global_maximum_curvature(point_in_curve))
-        maximum_curvarture = max(self.global_maximum_curvature(nb_eval=21, point_in_curve=point_in_curve))
-        return maximum_curvarture
+            if max_curvature:
+                curvature, point = max(self.global_curvature(nb_eval=21, point_in_curve=point_in_curve))
+            else:
+                curvature, point = min(self.global_curvature(nb_eval=21, point_in_curve=point_in_curve))
+            return curvature, point
+        # print(self.global_curvature(point_in_curve))
+        if max_curvature:
+            curvature = max(self.global_curvature(nb_eval=21, point_in_curve=point_in_curve))
+        else:
+            min(self.global_curvature(nb_eval=21, point_in_curve=point_in_curve))
+        return curvature
 
     def minimum_radius(self, point_in_curve=False):
         """
         Returns the minimum curvature radius of a curve and the point where it is located
         """
         if point_in_curve:
-            maximum_curvarture, point = self.maximum_curvature(point_in_curve)
-            return 1 / maximum_curvarture, point
-        maximum_curvarture = self.maximum_curvature(point_in_curve)
-        return 1 / maximum_curvarture
-
-    def global_minimum_curvature(self, nb_eval: int = 21):
-        check = [i / (nb_eval - 1) for i in range(nb_eval)]
-        radius = []
-        for u in check:
-            radius.append(self.minimum_curvature(u))
-        return radius
+            maximum_curvature, point = self.max_min_curvature(point_in_curve)
+            return 1 / maximum_curvature, point
+        maximum_curvature = self.max_min_curvature()
+        return 1 / maximum_curvature
+    
+    def maximum_radius(self, point_in_curve=False):
+        """
+        Returns the maximum curvature radius of a curve and the point where it is located
+        """
+        if point_in_curve:
+            minimum_curvature, point = self.max_min_curvature(point_in_curve, max_curvature=False)
+            return 1 / minimum_curvature, point
+        minimum_curvature = self.max_min_curvature(max_curvature=False)
+        return 1 / minimum_curvature
 
     def triangulation(self):
         return None
