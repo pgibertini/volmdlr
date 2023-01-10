@@ -118,10 +118,6 @@ class Stl(dc.DessiaObject):
                             distance_multiplier * stream.read_f4le(),
                             distance_multiplier * stream.read_f4le())
             
-            tri = vmf.Triangle3D(p1, p2, p3)
-            if tri.area() < 1e-12 or np.unique([round(p,6) for p in [p1, p2, p3]]).size != 3:
-                invalid_triangles.append(i)
-                
             try:
                 triangles[i] = vmf.Triangle3D(p1, p2, p3)
             except ZeroDivisionError:
@@ -344,3 +340,25 @@ class Stl(dc.DessiaObject):
         for invalid_triangle_index in invalid_triangles[::-1]:
             triangles.pop(invalid_triangle_index)
         return Stl(triangles)
+    
+class Stls(dc.DessiaObject):
+    """
+    STL files manager.
+    """
+    def __init__(self, stls: List[Stl], name: str = ''):
+        self.stls = stls
+        dc.DessiaObject.__init__(self, name=name)
+
+        self.normals = None
+        
+    @classmethod
+    def from_binary_streams(cls, streams: List[BinaryFile], distance_multiplier: float = 0.001):
+        stls = []
+        for stream in streams:
+            stl = Stl.from_binary_stream(stream, distance_multiplier)
+            stls.append(stl.clean_flat_triangles())
+        return cls(stls)
+        
+    def to_volume_model(self):
+        volumes = [stl.to_volume_model() for stl in self.stls]
+        return vmc.VolumeModel(sum([volume.primitives for volume in volumes],[]), name=self.name)
