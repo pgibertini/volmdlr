@@ -1,18 +1,19 @@
-import dessia_common.workflow as wf
+import dessia_common.workflow.core as wf
+import dessia_common.workflow.blocks as blocks
 import volmdlr as vm
 from volmdlr import stl
 from dessia_common.typings import MethodType
 
-read_stl_method_type = wf.blocks.ClassMethodType(class_=vm.stl.Stl, name='from_binary_stream')
-cls_method_stl = wf.blocks.ClassMethod(read_stl_method_type, name = 'STLFile')
+read_stl_method_type = blocks.ClassMethodType(class_=vm.stl.Stl, name='from_binary_stream')
+cls_method_stl = blocks.ClassMethod(read_stl_method_type, name = 'STLFile')
 
-to_volumemodel_method_type = wf.blocks.MethodType(class_=vm.stl.Stl, name='to_volume_model')
-method_volumemodel = wf.blocks.ModelMethod(to_volumemodel_method_type, name = 'VolumeModel')
+to_volumemodel_method_type = blocks.MethodType(class_=vm.stl.Stl, name='to_volume_model')
+method_volumemodel = blocks.ModelMethod(to_volumemodel_method_type, name = 'VolumeModel')
 
 
-cadview_block = wf.blocks.CadView(name='Display3D')
+cadview_block = blocks.CadView(name='Display3D')
 
-export_html = wf.blocks.Export(method_type=MethodType(vm.core.VolumeModel, 'to_html_stream'), filename='VolumeModel.html', extension='html', text=True, name='Export_html')
+export_html = blocks.Export(method_type=MethodType(vm.core.VolumeModel, 'to_html_stream'), filename='VolumeModel.html', extension='html', text=True, name='Export_html')
 
 pipes = [
          wf.Pipe(cls_method_stl.outputs[0], method_volumemodel.inputs[0]),
@@ -23,13 +24,13 @@ pipes = [
          ]
 
 
-workflow_stl = wf.core.Workflow([cls_method_stl, method_volumemodel,
-                                cadview_block,
-                                export_html,
-                                ],
-                                pipes,
-                                method_volumemodel.outputs[0],
-                                name='From stl to volume model')
+workflow_stl = wf.Workflow([cls_method_stl, method_volumemodel,
+                            cadview_block,
+                            export_html,
+                            ],
+                           pipes,
+                           method_volumemodel.outputs[0],
+                           name='From stl to volume model')
 
 workflow_stl.description = "Import STL to Volume Model"
 
@@ -45,5 +46,5 @@ dict_workflow_stl = {i:j.name for i, j in enumerate(workflow_stl.inputs)}
 # =============================================================================
 
 # from dessia_api_client.users import PlatformUser
-# platform = PlatformUser(api_url="https://api.platform.dessia.ovh")
+# platform = PlatformUser(api_url="https://api.renault.dessia.ovh")
 # r = platform.objects.create_object_from_python_object(workflow_stl)

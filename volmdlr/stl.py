@@ -20,6 +20,7 @@ from dessia_common.files import BinaryFile, StringFile
 import volmdlr as vm
 import volmdlr.core as vmc
 import volmdlr.faces as vmf
+import numpy as np
 
 
 # from kaitaistruct import KaitaiStream
@@ -116,6 +117,11 @@ class Stl(dc.DessiaObject):
             p3 = vm.Point3D(distance_multiplier * stream.read_f4le(),
                             distance_multiplier * stream.read_f4le(),
                             distance_multiplier * stream.read_f4le())
+            
+            tri = vmf.Triangle3D(p1, p2, p3)
+            if tri.area() < 1e-12 or np.unique([round(p,6) for p in [p1, p2, p3]]).size != 3:
+                invalid_triangles.append(i)
+                
             try:
                 triangles[i] = vmf.Triangle3D(p1, p2, p3)
             except ZeroDivisionError:
@@ -329,11 +335,11 @@ class Stl(dc.DessiaObject):
 
     def clean_flat_triangles(self) -> 'Stl':
         invalid_triangles = []
-        for it, triangles in enumerate(self.triangles):
-            if triangles.area() < 1e-12:
+        for it, triangle in enumerate(self.triangles):
+            if triangle.area() < 1e-12 or np.unique([round(p,6) for p in triangle.points]).size != 3:
                 invalid_triangles.append(it)
-                print(it, triangles.area())
-
+                print(it, triangle.area())
+                
         triangles = self.triangles[:]
         for invalid_triangle_index in invalid_triangles[::-1]:
             triangles.pop(invalid_triangle_index)
