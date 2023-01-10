@@ -41,35 +41,6 @@ dict_workflow_stl = {i:j.name for i, j in enumerate(workflow_stl.inputs)}
 
 # workflow_stl._check_platform()
 
-# # =============================================================================
-# # Usecase
-# # =============================================================================
-# from pathlib import Path
-
-# from dessia_common.files import BinaryFile
-# study_dir = str(Path('C:/Users/Mack/Documents/git/RenaultCustom/scripts/planche_de_bord/clean_translated_S49'))
-# filename1 = 'CPOM0M4CFN_S52_traverse.stl'
-# filename2 = 'CPOM0M4C6W_S52_planche.stl'
-
-# with open(study_dir + '/Geometries_stl_files/'+filename1,'rb') as stream_1 ,\
-#     open(study_dir + '/Geometries_stl_files/'+filename2,'rb') as stream_2:
-    
-#     str_file1 = BinaryFile(filename1)
-#     str_file1.write(stream_1.read())
-    
-#     str_file2 = BinaryFile(filename2)
-#     str_file2.write(stream_2.read())
-
-#     input_values = {}
-#     for i, j in dict_workflow_stl.items():
-#         if 'streams' == j:
-#             input_values[i] = [str_file1, str_file2]
-#         elif 'filename' == j:
-#             input_values[i] = filename1+'_'+filename2
-
-
-#     workflow_run = workflow_stl.run(input_values)
-
 # =============================================================================
 # Platform insertion
 # =============================================================================
