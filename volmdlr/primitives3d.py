@@ -63,10 +63,8 @@ class RoundedLineSegments3D(volmdlr.primitives.RoundedLineSegments):
 
         u1 = (point_1 - point_i) / dist1
         u2 = (point_2 - point_i) / dist2
-
         p3 = point_i + u1 * dist
         p4 = point_i + u2 * dist
-
         n = u1.cross(u2)
         n /= n.norm()
         v1 = u1.cross(n)
@@ -1123,7 +1121,7 @@ class Cylinder(shells.ClosedShell3D):
         :return: True if the given point is inside the cylinder, False otherwise
         """
 
-        if self.axis == volmdlr.Z3D or -self.axis == volmdlr.Z3D:
+        if self.axis.to_vector() == volmdlr.Z3D or -self.axis.to_vector() == volmdlr.Z3D:
             local_frame = volmdlr.Frame3D.from_point_and_vector(
                 point=self.position, vector=self.axis, main_axis=volmdlr.Y3D
             )
