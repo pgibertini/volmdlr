@@ -4115,6 +4115,24 @@ class LineSegment3D(LineSegment):
                 return k
         raise NotImplementedError
 
+    def distance_linesegment(self, linesegment, return_points=False):
+        """
+        Calculates the minimum distance between two line segments in 3d.
+
+        :param linesegment: other line segment.
+        :param return_points: boolean weather to return the minimum distance corresponding points or not.
+        :return: minimum distance / minimal distance with corresponding points.
+        """
+        p1, p2 = self.minimum_distance_points(linesegment)
+        if not self.point_belongs(p1):
+            p1 = self.start if self.start.point_distance(p1) < self.end.point_distance(p1) else self.end
+        if not linesegment.point_belongs(p2):
+            p2 = linesegment.start if linesegment.start.point_distance(p2) <\
+                                      linesegment.end.point_distance(p2) else linesegment.end
+        if return_points:
+            return p1.point_distance(p2), p1, p2
+        return p1.point_distance(p2)
+
     def minimum_distance(self, element, return_points=False):
         """
         Gets the minimum distance between a Line segment 3D and another edge.
