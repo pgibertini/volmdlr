@@ -4181,6 +4181,7 @@ class LineSegment3D(LineSegment):
         """
         u = self.unit_direction_vector()
         v = extrusion_vector.copy()
+
         v.normalize()
         w = u.cross(v)
         length_1 = self.length()

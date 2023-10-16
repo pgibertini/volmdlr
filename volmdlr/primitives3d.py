@@ -1121,7 +1121,7 @@ class Cylinder(shells.ClosedShell3D):
         :return: True if the given point is inside the cylinder, False otherwise
         """
 
-        if self.axis == volmdlr.Z3D or -self.axis == volmdlr.Z3D:
+        if self.axis.to_vector() == volmdlr.Z3D or -self.axis.to_vector() == volmdlr.Z3D:
             local_frame = volmdlr.Frame3D.from_point_and_vector(
                 point=self.position, vector=self.axis, main_axis=volmdlr.Y3D
             )
